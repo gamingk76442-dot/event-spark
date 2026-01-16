@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, ArrowLeft, Calendar, Clock, User, Phone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Booking = () => {
   const [searchParams] = useSearchParams();
@@ -18,6 +19,7 @@ const Booking = () => {
     time: ""
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -26,7 +28,7 @@ const Booking = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate
@@ -39,12 +41,33 @@ const Booking = () => {
       return;
     }
 
-    // Simulate booking
-    setIsSubmitted(true);
-    toast({
-      title: "Booking Confirmed! ✅",
-      description: "Our team will check availability and confirm shortly.",
-    });
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from("bookings").insert({
+        service_name: serviceName,
+        customer_name: formData.customerName,
+        mobile: formData.mobile,
+        event_date: formData.date,
+        event_time: formData.time,
+      });
+
+      if (error) throw error;
+
+      setIsSubmitted(true);
+      toast({
+        title: "Booking Confirmed! ✅",
+        description: "Our team will check availability and confirm shortly.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Booking Failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -207,9 +230,10 @@ const Booking = () => {
 
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-accent text-accent-foreground rounded-xl font-semibold text-lg hover:opacity-90 transition-all shadow-lg mt-4"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-gradient-accent text-accent-foreground rounded-xl font-semibold text-lg hover:opacity-90 transition-all shadow-lg mt-4 disabled:opacity-50"
               >
-                Confirm Booking
+                {isSubmitting ? "Submitting..." : "Confirm Booking"}
               </button>
             </form>
           </div>
