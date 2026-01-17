@@ -1,23 +1,45 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock, Mail, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, ArrowLeft, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const { signIn, isAdmin } = useAuth();
+  const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (isSignUp) {
+      const { error } = await signUp(email, password, fullName);
+      if (error) {
+        toast({
+          title: "Signup Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      toast({
+        title: "Account Created!",
+        description: "You can now sign in. Contact an admin to get admin privileges.",
+      });
+      setIsSignUp(false);
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await signIn(email, password);
 
@@ -31,7 +53,6 @@ const AdminLogin = () => {
       return;
     }
 
-    // Wait a moment for auth state to update
     setTimeout(() => {
       navigate("/admin");
     }, 500);
@@ -57,11 +78,34 @@ const AdminLogin = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Admin Login</h1>
-            <p className="text-muted-foreground mt-2">Sign in to access the admin panel</p>
+            <h1 className="text-2xl font-serif font-bold text-foreground">
+              {isSignUp ? "Create Account" : "Admin Login"}
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              {isSignUp ? "Sign up to access the admin panel" : "Sign in to access the admin panel"}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {isSignUp && (
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your full name"
+                    className="w-full pl-12 pr-4 py-3 bg-background rounded-xl border border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Email Address
@@ -92,6 +136,7 @@ const AdminLogin = () => {
                   placeholder="Enter your password"
                   className="w-full pl-12 pr-12 py-3 bg-background rounded-xl border border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   required
+                  minLength={6}
                 />
                 <button
                   type="button"
@@ -108,9 +153,18 @@ const AdminLogin = () => {
               disabled={isLoading}
               className="w-full py-4 bg-gradient-accent text-accent-foreground rounded-xl font-semibold text-lg hover:opacity-90 transition-all shadow-lg disabled:opacity-50"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? (isSignUp ? "Creating Account..." : "Signing in...") : (isSignUp ? "Create Account" : "Sign In")}
             </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-primary hover:underline text-sm"
+            >
+              {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>
