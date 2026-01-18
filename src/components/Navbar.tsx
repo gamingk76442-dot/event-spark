@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -50,6 +50,15 @@ const Navbar = () => {
             >
               Book Now
             </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="flex items-center gap-2 px-4 py-2 text-primary-foreground/90 hover:text-saffron transition-colors font-medium"
+              >
+                <Settings size={18} />
+                Admin
+              </Link>
+            )}
             {user ? (
               <button
                 onClick={signOut}
@@ -106,6 +115,16 @@ const Navbar = () => {
               >
                 Book Now
               </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 px-6 py-3 text-primary-foreground/90 hover:text-saffron transition-colors font-medium border border-primary-foreground/20 rounded-full"
+                >
+                  <Settings size={18} />
+                  Admin Panel
+                </Link>
+              )}
               {user ? (
                 <button
                   onClick={() => {
