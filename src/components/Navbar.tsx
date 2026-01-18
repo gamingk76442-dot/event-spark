@@ -1,12 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user, signOut } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -48,6 +50,23 @@ const Navbar = () => {
             >
               Book Now
             </Link>
+            {user ? (
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 px-4 py-2 text-primary-foreground/90 hover:text-saffron transition-colors font-medium"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center gap-2 px-4 py-2 text-primary-foreground/90 hover:text-saffron transition-colors font-medium"
+              >
+                <User size={18} />
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -87,6 +106,27 @@ const Navbar = () => {
               >
                 Book Now
               </Link>
+              {user ? (
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 px-6 py-3 text-primary-foreground/90 hover:text-saffron transition-colors font-medium border border-primary-foreground/20 rounded-full"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 px-6 py-3 text-primary-foreground/90 hover:text-saffron transition-colors font-medium border border-primary-foreground/20 rounded-full"
+                >
+                  <User size={18} />
+                  Login
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
