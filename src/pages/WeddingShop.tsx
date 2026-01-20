@@ -14,7 +14,7 @@ interface ServiceVariety {
   price: string | null;
 }
 
-const Lighting = () => {
+const WeddingShop = () => {
   const [varieties, setVarieties] = useState<ServiceVariety[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -23,7 +23,7 @@ const Lighting = () => {
       const { data, error } = await supabase
         .from("services")
         .select("*")
-        .eq("category", "Lighting")
+        .eq("category", "Wedding Shop")
         .eq("is_active", true)
         .order("display_order");
 
@@ -41,8 +41,8 @@ const Lighting = () => {
       <Navbar />
       
       <PageHeader 
-        title="Lighting Varieties" 
-        subtitle="Professional lighting solutions for every occasion"
+        title="Wedding Shop" 
+        subtitle="Garlands, decorations & wedding accessories for your special day"
       />
 
       <div className="container mx-auto px-4 py-16 flex-1">
@@ -62,7 +62,7 @@ const Lighting = () => {
                 <ServiceCard
                   title={variety.name}
                   description={variety.description || ""}
-                  image={variety.image_url || "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=400"}
+                  image={variety.image_url || "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400"}
                   price={variety.price || undefined}
                   link={`/booking?service=${encodeURIComponent(variety.name)}`}
                   buttonText="Book Now"
@@ -82,4 +82,4 @@ const Lighting = () => {
   );
 };
 
-export default Lighting;
+export default WeddingShop;
