@@ -57,6 +57,7 @@ const Services = () => {
 
   useEffect(() => {
     const fetchOtherServices = async () => {
+      // Fetch services with "Other" category - these become main service cards
       const { data, error } = await supabase
         .from("services")
         .select("*")
@@ -110,7 +111,7 @@ const Services = () => {
             </motion.div>
           ))}
           
-          {/* Other services from database */}
+          {/* Other services from database - these link to variety pages */}
           {otherServices.map((service, index) => (
             <motion.div
               key={service.id}
@@ -122,9 +123,8 @@ const Services = () => {
                 title={service.name}
                 description={service.description || ""}
                 image={service.image_url || "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400"}
-                price={service.price || undefined}
-                link={`/booking?service=${encodeURIComponent(service.name)}`}
-                buttonText="Book Now"
+                link={`/service/${encodeURIComponent(service.name)}`}
+                buttonText="View Varieties"
               />
             </motion.div>
           ))}

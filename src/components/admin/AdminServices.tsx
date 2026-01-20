@@ -28,13 +28,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const SERVICE_CATEGORIES = [
+const FIXED_CATEGORIES = [
   { value: "Wedding Mandap", label: "Wedding Mandap" },
   { value: "Lighting", label: "Lighting" },
   { value: "Wedding Shop", label: "Wedding Shop" },
   { value: "Drums", label: "Drums" },
   { value: "Driving Services", label: "Driving Services" },
-  { value: "Other", label: "Other (New Service)" },
+  { value: "Other", label: "Other (Create New Service)" },
 ];
 
 interface Service {
@@ -57,6 +57,7 @@ const AdminServices = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -66,6 +67,13 @@ const AdminServices = () => {
     is_active: true,
     display_order: 0,
   });
+
+  // Get all categories including custom ones (from "Other" services)
+  const allCategories = [
+    ...FIXED_CATEGORIES.filter(c => c.value !== "Other"),
+    ...customCategories.map(name => ({ value: name, label: `${name} (Custom)` })),
+    { value: "Other", label: "Other (Create New Service)" },
+  ];
 
   const fetchServices = async () => {
     setLoading(true);
@@ -77,6 +85,10 @@ const AdminServices = () => {
 
       if (error) throw error;
       setServices(data || []);
+      
+      // Extract custom categories from "Other" services
+      const otherServices = (data || []).filter(s => s.category === "Other");
+      setCustomCategories(otherServices.map(s => s.name));
     } catch (error: any) {
       toast({
         title: "Error fetching services",
@@ -417,7 +429,7 @@ const AdminServices = () => {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SERVICE_CATEGORIES.map((cat) => (
+                    {allCategories.map((cat) => (
                       <SelectItem key={cat.value} value={cat.value}>
                         {cat.label}
                       </SelectItem>
