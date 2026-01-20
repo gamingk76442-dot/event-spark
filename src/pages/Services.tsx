@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
+import { supabase } from "@/integrations/supabase/client";
 
-const services = [
+const defaultServices = [
   {
     title: "Wedding Mandap",
     description: "Beautiful mandap setups for traditional and modern weddings",
@@ -41,7 +43,36 @@ const services = [
   }
 ];
 
+interface OtherService {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: string | null;
+}
+
 const Services = () => {
+  const [otherServices, setOtherServices] = useState<OtherService[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOtherServices = async () => {
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .eq("category", "Other")
+        .eq("is_active", true)
+        .order("display_order");
+
+      if (!error && data) {
+        setOtherServices(data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchOtherServices();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -68,7 +99,7 @@ const Services = () => {
       {/* Services Grid */}
       <div className="container mx-auto px-4 py-16 flex-1">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
+          {defaultServices.map((service, index) => (
             <motion.div
               key={service.title}
               initial={{ opacity: 0, y: 20 }}
@@ -78,7 +109,32 @@ const Services = () => {
               <ServiceCard {...service} />
             </motion.div>
           ))}
+          
+          {/* Other services from database */}
+          {otherServices.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: (defaultServices.length + index) * 0.1 }}
+            >
+              <ServiceCard
+                title={service.name}
+                description={service.description || ""}
+                image={service.image_url || "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400"}
+                price={service.price || undefined}
+                link={`/booking?service=${encodeURIComponent(service.name)}`}
+                buttonText="Book Now"
+              />
+            </motion.div>
+          ))}
         </div>
+        
+        {isLoading && (
+          <div className="flex justify-center mt-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
       </div>
 
       <Footer />

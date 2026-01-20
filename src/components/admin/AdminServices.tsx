@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit, Trash2, Eye, EyeOff, GripVertical, Upload, Image, X, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, GripVertical, Upload, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -17,9 +17,25 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+const SERVICE_CATEGORIES = [
+  { value: "Wedding Mandap", label: "Wedding Mandap" },
+  { value: "Lighting", label: "Lighting" },
+  { value: "Wedding Shop", label: "Wedding Shop" },
+  { value: "Drums", label: "Drums" },
+  { value: "Driving Services", label: "Driving Services" },
+  { value: "Other", label: "Other (New Service)" },
+];
 
 interface Service {
   id: string;
@@ -392,12 +408,22 @@ const AdminServices = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
-                <Input
+                <label className="text-sm font-medium mb-2 block">Category *</label>
+                <Select
                   value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  placeholder="e.g., Wedding, Reception"
-                />
+                  onValueChange={(value) => setForm({ ...form, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SERVICE_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Price</label>
