@@ -1,36 +1,41 @@
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import PageHeader from "@/components/PageHeader";
+import { supabase } from "@/integrations/supabase/client";
 
-const mandapVarieties = [
-  {
-    title: "Traditional Mandap",
-    description: "Classic wooden mandap with beautiful floral décor",
-    image: "https://i.pinimg.com/originals/66/c9/34/66c934ac7feb88115ac1fad19b79311b.jpg",
-    price: "₹25,000",
-    link: "/booking?service=Traditional%20Mandap",
-    buttonText: "Book Now"
-  },
-  {
-    title: "Modern Mandap",
-    description: "LED based modern wedding mandap with contemporary design",
-    image: "https://tse1.mm.bing.net/th/id/OIP.pvBhvHWiXFoQCJz_XisZ1gHaHa?pid=Api&P=0&h=180",
-    price: "₹35,000",
-    link: "/booking?service=Modern%20Mandap",
-    buttonText: "Book Now"
-  },
-  {
-    title: "Royal Mandap",
-    description: "Premium royal style grand mandap for luxury weddings",
-    image: "https://i.pinimg.com/originals/3d/a4/23/3da42361d3cf2f7f3655e83ce3cbdcdf.jpg",
-    price: "₹50,000",
-    link: "/booking?service=Royal%20Mandap",
-    buttonText: "Book Now"
-  }
-];
+interface ServiceVariety {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: string | null;
+}
 
 const Mandap = () => {
+  const [varieties, setVarieties] = useState<ServiceVariety[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVarieties = async () => {
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .eq("category", "Wedding Mandap")
+        .eq("is_active", true)
+        .order("display_order");
+
+      if (!error && data) {
+        setVarieties(data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchVarieties();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -41,11 +46,35 @@ const Mandap = () => {
       />
 
       <div className="container mx-auto px-4 py-16 flex-1">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mandapVarieties.map((mandap) => (
-            <ServiceCard key={mandap.title} {...mandap} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : varieties.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {varieties.map((variety, index) => (
+              <motion.div
+                key={variety.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ServiceCard
+                  title={variety.name}
+                  description={variety.description || ""}
+                  image={variety.image_url || "https://images.unsplash.com/photo-1519741497674-611481863552?w=400"}
+                  price={variety.price || undefined}
+                  link={`/booking?service=${encodeURIComponent(variety.name)}`}
+                  buttonText="Book Now"
+                />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">No varieties available at the moment. Please check back later.</p>
+          </div>
+        )}
       </div>
 
       <Footer />

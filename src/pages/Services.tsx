@@ -22,25 +22,22 @@ const services = [
     title: "Wedding Shop",
     description: "Garlands, decorations & wedding accessories",
     image: "https://tse2.mm.bing.net/th?id=OIF.9bdzH5sI%2fOHHuOQR9qMWOQ&pid=Api&P=0&h=180",
-    price: "Starting ₹10,000",
-    link: "/booking?service=Wedding%20Shop",
-    buttonText: "Book Now"
+    link: "/wedding-shop",
+    buttonText: "View Varieties"
   },
   {
     title: "Drums",
     description: "Traditional & wedding drums for ceremonies",
     image: "https://tastysnack.in/wp-content/uploads/2022/12/Kerala-Bride-Played-Drum-During-Wedding-Gone-Viral-4-1120x728.jpg",
-    price: "Starting ₹8,000",
-    link: "/booking?service=Drums",
-    buttonText: "Book Now"
+    link: "/drums",
+    buttonText: "View Varieties"
   },
   {
     title: "Driving Services",
     description: "Professional drivers for your events",
     image: "https://tse2.mm.bing.net/th/id/OIP.BekLeG_3xl_3aZb-GfAXOAHaE7?pid=Api&P=0&h=180",
-    price: "Starting ₹5,000",
-    link: "/booking?service=Driving%20Services",
-    buttonText: "Book Now"
+    link: "/driving-services",
+    buttonText: "View Varieties"
   }
 ];
 
