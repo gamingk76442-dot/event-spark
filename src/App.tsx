@@ -11,6 +11,7 @@ import Lighting from "./pages/Lighting";
 import WeddingShop from "./pages/WeddingShop";
 import Drums from "./pages/Drums";
 import DrivingServices from "./pages/DrivingServices";
+import ServiceVariety from "./pages/ServiceVariety";
 import Booking from "./pages/Booking";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/wedding-shop" element={<WeddingShop />} />
             <Route path="/drums" element={<Drums />} />
             <Route path="/driving-services" element={<DrivingServices />} />
+            <Route path="/service/:category" element={<ServiceVariety />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
