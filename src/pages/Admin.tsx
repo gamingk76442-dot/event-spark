@@ -6,7 +6,8 @@ import {
   Home,
   CalendarDays,
   Sparkles,
-  Settings
+  Settings,
+  FolderOpen
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminBookings from "@/components/admin/AdminBookings";
 import AdminServices from "@/components/admin/AdminServices";
 import AdminSettings from "@/components/admin/AdminSettings";
+import AdminCategories from "@/components/admin/AdminCategories";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -91,6 +93,10 @@ const Admin = () => {
                 <CalendarDays size={16} />
                 Bookings
               </TabsTrigger>
+              <TabsTrigger value="categories" className="flex items-center gap-2">
+                <FolderOpen size={16} />
+                Categories
+              </TabsTrigger>
               <TabsTrigger value="services" className="flex items-center gap-2">
                 <Sparkles size={16} />
                 Services
@@ -103,6 +109,10 @@ const Admin = () => {
 
             <TabsContent value="bookings">
               <AdminBookings />
+            </TabsContent>
+
+            <TabsContent value="categories">
+              <AdminCategories />
             </TabsContent>
 
             <TabsContent value="services">

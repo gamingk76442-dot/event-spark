@@ -5,41 +5,49 @@ import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import { supabase } from "@/integrations/supabase/client";
 
-const defaultServices = [
+interface CategoryConfig {
+  key: string;
+  defaultTitle: string;
+  defaultDescription: string;
+  defaultImage: string;
+  link: string;
+}
+
+const DEFAULT_CATEGORIES: CategoryConfig[] = [
   {
-    title: "Wedding Mandap",
-    description: "Beautiful mandap setups for traditional and modern weddings",
-    image: "https://i.pinimg.com/originals/59/0c/da/590cda3575908c87e1f14804ae46e155.jpg",
+    key: "wedding_mandap",
+    defaultTitle: "Wedding Mandap",
+    defaultDescription: "Beautiful mandap setups for traditional and modern weddings",
+    defaultImage: "https://i.pinimg.com/originals/59/0c/da/590cda3575908c87e1f14804ae46e155.jpg",
     link: "/mandap",
-    buttonText: "View Varieties"
   },
   {
-    title: "Lighting",
-    description: "Professional decorative lighting for all occasions",
-    image: "https://tse2.mm.bing.net/th/id/OIP.yTLhRdw3xUgVkU82r98kwAHaEn?pid=Api&P=0&h=180",
+    key: "lighting",
+    defaultTitle: "Lighting",
+    defaultDescription: "Professional decorative lighting for all occasions",
+    defaultImage: "https://tse2.mm.bing.net/th/id/OIP.yTLhRdw3xUgVkU82r98kwAHaEn?pid=Api&P=0&h=180",
     link: "/lighting",
-    buttonText: "View Varieties"
   },
   {
-    title: "Wedding Shop",
-    description: "Garlands, decorations & wedding accessories",
-    image: "https://tse2.mm.bing.net/th?id=OIF.9bdzH5sI%2fOHHuOQR9qMWOQ&pid=Api&P=0&h=180",
+    key: "wedding_shop",
+    defaultTitle: "Wedding Shop",
+    defaultDescription: "Garlands, decorations & wedding accessories",
+    defaultImage: "https://tse2.mm.bing.net/th?id=OIF.9bdzH5sI%2fOHHuOQR9qMWOQ&pid=Api&P=0&h=180",
     link: "/wedding-shop",
-    buttonText: "View Varieties"
   },
   {
-    title: "Drums",
-    description: "Traditional & wedding drums for ceremonies",
-    image: "https://tastysnack.in/wp-content/uploads/2022/12/Kerala-Bride-Played-Drum-During-Wedding-Gone-Viral-4-1120x728.jpg",
+    key: "drums",
+    defaultTitle: "Drums",
+    defaultDescription: "Traditional & wedding drums for ceremonies",
+    defaultImage: "https://tastysnack.in/wp-content/uploads/2022/12/Kerala-Bride-Played-Drum-During-Wedding-Gone-Viral-4-1120x728.jpg",
     link: "/drums",
-    buttonText: "View Varieties"
   },
   {
-    title: "Driving Services",
-    description: "Professional drivers for your events",
-    image: "https://tse2.mm.bing.net/th/id/OIP.BekLeG_3xl_3aZb-GfAXOAHaE7?pid=Api&P=0&h=180",
+    key: "driving_services",
+    defaultTitle: "Driving Services",
+    defaultDescription: "Professional drivers for your events",
+    defaultImage: "https://tse2.mm.bing.net/th/id/OIP.BekLeG_3xl_3aZb-GfAXOAHaE7?pid=Api&P=0&h=180",
     link: "/driving-services",
-    buttonText: "View Varieties"
   }
 ];
 
@@ -51,13 +59,40 @@ interface OtherService {
   price: string | null;
 }
 
+interface CategorySettings {
+  [key: string]: { title: string; description: string; image: string };
+}
+
 const Services = () => {
   const [otherServices, setOtherServices] = useState<OtherService[]>([]);
+  const [categorySettings, setCategorySettings] = useState<CategorySettings>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOtherServices = async () => {
-      // Fetch services with "Other" category - these become main service cards
+    const fetchData = async () => {
+      // Fetch category settings from site_settings
+      const { data: settingsData } = await supabase
+        .from("site_settings")
+        .select("*")
+        .like("setting_key", "category_%");
+
+      if (settingsData) {
+        const settings: CategorySettings = {};
+        settingsData.forEach((s) => {
+          // Parse setting_key like "category_wedding_mandap_title"
+          const match = s.setting_key.match(/^category_(.+)_(title|description|image)$/);
+          if (match) {
+            const [, catKey, field] = match;
+            if (!settings[catKey]) {
+              settings[catKey] = { title: "", description: "", image: "" };
+            }
+            settings[catKey][field as "title" | "description" | "image"] = s.setting_value || "";
+          }
+        });
+        setCategorySettings(settings);
+      }
+
+      // Fetch services with "Other" category
       const { data, error } = await supabase
         .from("services")
         .select("*")
@@ -71,8 +106,18 @@ const Services = () => {
       setIsLoading(false);
     };
 
-    fetchOtherServices();
+    fetchData();
   }, []);
+
+  const getServiceDisplay = (cat: CategoryConfig) => {
+    const custom = categorySettings[cat.key];
+    return {
+      title: custom?.title || cat.defaultTitle,
+      description: custom?.description || cat.defaultDescription,
+      image: custom?.image || cat.defaultImage,
+      link: cat.link,
+    };
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -100,24 +145,33 @@ const Services = () => {
       {/* Services Grid */}
       <div className="container mx-auto px-4 py-16 flex-1">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {defaultServices.map((service, index) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <ServiceCard {...service} />
-            </motion.div>
-          ))}
+          {DEFAULT_CATEGORIES.map((cat, index) => {
+            const display = getServiceDisplay(cat);
+            return (
+              <motion.div
+                key={cat.key}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ServiceCard
+                  title={display.title}
+                  description={display.description}
+                  image={display.image}
+                  link={display.link}
+                  buttonText="View Varieties"
+                />
+              </motion.div>
+            );
+          })}
           
-          {/* Other services from database - these link to variety pages */}
+          {/* Other services from database */}
           {otherServices.map((service, index) => (
             <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: (defaultServices.length + index) * 0.1 }}
+              transition={{ delay: (DEFAULT_CATEGORIES.length + index) * 0.1 }}
             >
               <ServiceCard
                 title={service.name}
