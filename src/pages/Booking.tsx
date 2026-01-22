@@ -113,6 +113,42 @@ const Booking = () => {
 
       if (error) throw error;
 
+      // Fetch notification settings and send notifications
+      try {
+        const { data: settings } = await supabase
+          .from("site_settings")
+          .select("setting_key, setting_value")
+          .in("setting_key", ["notification_email", "notification_whatsapp"]);
+
+        const notificationEmail = settings?.find(s => s.setting_key === "notification_email")?.setting_value;
+        const notificationWhatsApp = settings?.find(s => s.setting_key === "notification_whatsapp")?.setting_value;
+
+        if (notificationEmail) {
+          // Send email notification via edge function
+          const response = await supabase.functions.invoke("send-booking-notification", {
+            body: {
+              customerName: formData.customerName,
+              mobile: formData.mobile,
+              serviceName,
+              eventDate: formData.date,
+              eventTime: formData.time,
+              notes: notes || "",
+              adminEmail: notificationEmail,
+              adminWhatsApp: notificationWhatsApp || undefined,
+            },
+          });
+
+          // If WhatsApp is configured and we got a link, open it in new tab
+          if (response.data?.whatsappLink && notificationWhatsApp) {
+            // Optional: open WhatsApp for admin (only works if admin is on the same device)
+            console.log("WhatsApp notification link:", response.data.whatsappLink);
+          }
+        }
+      } catch (notificationError) {
+        // Don't fail the booking if notification fails
+        console.error("Notification error:", notificationError);
+      }
+
       setIsSubmitted(true);
       toast({
         title: "Booking Confirmed! ✅",
