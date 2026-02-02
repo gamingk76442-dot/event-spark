@@ -3,6 +3,7 @@ import { Menu, X, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import ContactSheet from "@/components/ContactSheet";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,6 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
-    { name: "Contact", path: "/services#contact" },
   ];
 
   return (
@@ -44,6 +44,11 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            <ContactSheet>
+              <button className="text-primary-foreground/90 hover:text-saffron transition-colors font-medium">
+                Contact
+              </button>
+            </ContactSheet>
             <Link
               to="/services"
               className="px-6 py-2 bg-gradient-accent text-accent-foreground rounded-full font-semibold hover:opacity-90 transition-opacity shadow-lg"
@@ -108,6 +113,14 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              <ContactSheet>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="text-primary-foreground/90 hover:text-saffron transition-colors font-medium py-2 text-left"
+                >
+                  Contact
+                </button>
+              </ContactSheet>
               <Link
                 to="/services"
                 onClick={() => setIsOpen(false)}
