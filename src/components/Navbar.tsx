@@ -29,7 +29,7 @@ const Navbar = () => {
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-saffron"
             />
             <span className="text-lg md:text-xl font-serif font-bold text-primary-foreground">
-              Anjineya Service
+              Anjaneya Service
             </span>
           </Link>
 

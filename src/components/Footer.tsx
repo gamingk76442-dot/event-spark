@@ -14,7 +14,7 @@ const Footer = () => {
                 alt="Anjineya Service Logo" 
                 className="w-12 h-12 rounded-full object-cover border-2 border-saffron"
               />
-              <span className="text-xl font-serif font-bold">Anjineya Service</span>
+              <span className="text-xl font-serif font-bold">Anjaneya Service</span>
             </div>
             <p className="text-primary-foreground/80 text-sm">
               Premium wedding and event solutions for your special occasions. 
@@ -63,7 +63,7 @@ const Footer = () => {
                 className="flex items-center gap-3 text-primary-foreground/80 hover:text-saffron transition-colors"
               >
                 <Instagram size={18} />
-                <span>@anjineya_service</span>
+                <span>@anjaneya_service</span>
               </a>
             </div>
           </div>
