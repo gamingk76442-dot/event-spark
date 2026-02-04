@@ -7,7 +7,8 @@ import {
   Trash2, 
   Edit, 
   Filter,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +28,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import BookingDetailsCard from "./BookingDetailsCard";
 
 interface Booking {
   id: string;
@@ -222,7 +224,7 @@ const AdminBookings = () => {
                   <TableHead>Mobile</TableHead>
                   <TableHead>Date & Time</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Notes</TableHead>
+                  <TableHead>Details</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -259,8 +261,8 @@ const AdminBookings = () => {
                         {booking.status}
                       </span>
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {booking.notes || "-"}
+                    <TableCell className="max-w-[250px]">
+                      <BookingDetailsCard notes={booking.notes} />
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

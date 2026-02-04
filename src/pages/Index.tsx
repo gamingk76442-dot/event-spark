@@ -68,7 +68,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-primary-foreground mb-4"
           >
-            ANJINEYA SERVICE
+            Anjaneya Services
           </motion.h1>
 
           <motion.p

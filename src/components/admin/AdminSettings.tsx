@@ -13,13 +13,15 @@ interface Setting {
   description: string | null;
 }
 
-const settingLabels: Record<string, { label: string; type: "text" | "textarea" | "tel" | "email" }> = {
+const settingLabels: Record<string, { label: string; type: "text" | "textarea" | "tel" | "email"; description?: string }> = {
   site_title: { label: "Website Title", type: "text" },
   contact_phone: { label: "Contact Phone", type: "tel" },
   contact_email: { label: "Contact Email", type: "email" },
   contact_address: { label: "Business Address", type: "textarea" },
   whatsapp_number: { label: "WhatsApp Number", type: "tel" },
   about_text: { label: "About Section Text", type: "textarea" },
+  notification_email: { label: "Notification Email", type: "email", description: "Email address to receive booking notifications" },
+  notification_whatsapp: { label: "Notification WhatsApp", type: "tel", description: "WhatsApp number to receive booking alerts (with country code, e.g., 919876543210)" },
 };
 
 const AdminSettings = () => {
